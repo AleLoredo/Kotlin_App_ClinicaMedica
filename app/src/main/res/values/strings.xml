@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">ClubDeportivo</string>
+    <string name="userName">Username</string>
+    <string name="password">Password</string>
+    <string name="nroDocumento">Nro. Documento</string>
+    <string name="nombre">Nombre</string>
+    <string name="apellido">Apellido</string>
+    <string name="fechaNacimiento">Fecha de nacimiento</string>
+    <string name="domicilio">Domicilio</string>
+    <string name="email">Correo electrónico</string>
+    <string name="aptoFisico">Apto físico</string>
+    <string name="nroTicket">Nro.Ticket</string>
+    <string name="importe">Importe</string>
+    <string-array name="listadeDoc">
+        <item>DNI</item>
+        <item>LC</item>
+        <item>LE</item>
+        <item>PPTE</item>
+    </string-array>
+    <string-array name="listadeModalidad">
+        <item>Efectivo</item>
+        <item>Tarjeta débito</item>
+        <item>Tarjeta crédito</item>
+    </string-array>
+    <string-array name="listadeCuotas">
+        <item>1</item>
+        <item>3</item>
+        <item>6</item>
+    </string-array>
+    <string name="mostrarName">CLUB DEPORTIVO S.R.L.</string>
+    <string name="mostrarCuit">CUIT 30-11111111-1</string>
+</resources>
