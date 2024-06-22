@@ -8,9 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper
 class BDatos(context: Context) : SQLiteOpenHelper(context,
     BD, null, DATABASE_VERSION) {
 
+    //inicio tabla usuarios
     companion object {
         private const val BD = "BaseDatos"
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 3
 
         // Nombre de la tabla y columnas
         private const val TABLE_USUARIOS = "Usuarios"
@@ -18,6 +19,17 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         private const val COLUMN_NOMBRE = "nombreUsuario"
         private const val COLUMN_PASSWORD = "password"
         private const val COLUMN_TIPO = "tipo"
+
+        //agregado pra registro socios y no socios
+        private const val TABLE_SOCIOS = "Socios"
+        private const val TABLE_NO_SOCIOS = "NoSocios"
+        private const val COLUMN_DOCUMENTO = "documento"
+        private const val COLUMN_CNOMBRE = "nombre"
+        private const val COLUMN_APELLIDO = "apellido"
+        private const val COLUMN_FECHANACIMIENTO = "fechanacimiento"
+        private const val COLUMN_DOMICILIO = "domicilio"
+        private const val COLUMN_EMAIL = "email"
+        private const val COLUMN_APTOFISICO = "aptoFisico"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -26,7 +38,40 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
                 + "$COLUMN_NOMBRE TEXT, "
                 + "$COLUMN_PASSWORD TEXT, "
                 + "$COLUMN_TIPO TEXT)")
+        //val createSociosTable = "CREATE TABLE $TABLE_SOCIOS ($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_NAME TEXT, $COLUMN_AGE INTEGER)"
+
+        val createSociosTable = """
+    CREATE TABLE $TABLE_SOCIOS (
+        $COLUMN_ID INTEGER PRIMARY KEY, 
+        $COLUMN_DOCUMENTO TEXT, 
+        $COLUMN_CNOMBRE TEXT, 
+        $COLUMN_APELLIDO TEXT, 
+        $COLUMN_FECHANACIMIENTO TEXT, 
+        $COLUMN_DOMICILIO TEXT, 
+        $COLUMN_EMAIL TEXT, 
+        $COLUMN_APTOFISICO INTEGER
+    )
+""".trimIndent()
+
+        //val createNoSociosTable = "CREATE TABLE $TABLE_NO_SOCIOS ($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_NAME TEXT, $COLUMN_AGE INTEGER)"
+
+        val createNoSociosTable = """
+    CREATE TABLE $TABLE_NO_SOCIOS (
+        $COLUMN_ID INTEGER PRIMARY KEY, 
+        $COLUMN_DOCUMENTO TEXT, 
+        $COLUMN_CNOMBRE TEXT, 
+        $COLUMN_APELLIDO TEXT, 
+        $COLUMN_FECHANACIMIENTO TEXT, 
+        $COLUMN_DOMICILIO TEXT, 
+        $COLUMN_EMAIL TEXT 
+    )
+""".trimIndent()
+
         db?.execSQL(createTable)
+        db?.execSQL(createSociosTable)
+        db?.execSQL(createNoSociosTable)
+
+
 
         val adminValues = ContentValues().apply {
             put(COLUMN_NOMBRE, "admin")
@@ -40,10 +85,63 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_USUARIOS")
+        db?.execSQL("DROP TABLE IF EXISTS $TABLE_SOCIOS")
+        db?.execSQL("DROP TABLE IF EXISTS $TABLE_NO_SOCIOS")
         onCreate(db)
     }
 
-    // Métodos CRUD
+    //se agrega para registro de socios y no socios
+    fun insertSocio(
+        documento: String,
+        nombre: String,
+        apellido: String,
+        fechanacimiento: String,
+        domicilio: String,
+        email: String,
+        aptoFisico: String
+    ) {
+        val db = writableDatabase
+        val contentValues = ContentValues().apply {
+            put(COLUMN_DOCUMENTO, documento)
+            put(COLUMN_NOMBRE, nombre)
+            put(COLUMN_APELLIDO, apellido)
+            put(COLUMN_FECHANACIMIENTO, fechanacimiento)
+            put(COLUMN_DOMICILIO, domicilio)
+            put(COLUMN_EMAIL, email)
+            put(COLUMN_APTOFISICO, aptoFisico)
+        }
+        db.insert(TABLE_SOCIOS, null, contentValues)
+    }
+
+
+    //fun insertNoSocio(name: String, age: Int) {
+      //  val db = writableDatabase
+        //val contentValues = ContentValues().apply {
+          //  put(COLUMN_NAME, name)
+           // put(COLUMN_AGE, age)
+       // }
+   // }
+    fun insertNoSocio(
+        documento: String,
+        nombre: String,
+        apellido: String,
+        fechanacimiento: String,
+        domicilio: String,
+        email: String,
+    ) {
+        val db = writableDatabase
+        val contentValues = ContentValues().apply {
+            put(COLUMN_DOCUMENTO, documento)
+            put(COLUMN_NOMBRE, nombre)
+            put(COLUMN_APELLIDO, apellido)
+            put(COLUMN_FECHANACIMIENTO, fechanacimiento)
+            put(COLUMN_DOMICILIO, domicilio)
+            put(COLUMN_EMAIL, email)
+        }
+        db.insert(TABLE_NO_SOCIOS, null, contentValues)
+    }
+
+        // Métodos CRUD
     fun addUsuario(usuario: Usuario): Long {
         val db = this.writableDatabase
         val contentValues = ContentValues().apply {
