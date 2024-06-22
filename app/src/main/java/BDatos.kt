@@ -41,31 +41,31 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         //val createSociosTable = "CREATE TABLE $TABLE_SOCIOS ($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_NAME TEXT, $COLUMN_AGE INTEGER)"
 
         val createSociosTable = """
-    CREATE TABLE $TABLE_SOCIOS (
-        $COLUMN_ID INTEGER PRIMARY KEY, 
-        $COLUMN_DOCUMENTO TEXT, 
-        $COLUMN_CNOMBRE TEXT, 
-        $COLUMN_APELLIDO TEXT, 
-        $COLUMN_FECHANACIMIENTO TEXT, 
-        $COLUMN_DOMICILIO TEXT, 
-        $COLUMN_EMAIL TEXT, 
-        $COLUMN_APTOFISICO INTEGER
-    )
-""".trimIndent()
+        CREATE TABLE $TABLE_SOCIOS (
+            $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+            $COLUMN_DOCUMENTO TEXT, 
+            $COLUMN_CNOMBRE TEXT, 
+            $COLUMN_APELLIDO TEXT, 
+            $COLUMN_FECHANACIMIENTO TEXT, 
+            $COLUMN_DOMICILIO TEXT, 
+            $COLUMN_EMAIL TEXT, 
+            $COLUMN_APTOFISICO INTEGER
+        )
+        """.trimIndent()
 
         //val createNoSociosTable = "CREATE TABLE $TABLE_NO_SOCIOS ($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_NAME TEXT, $COLUMN_AGE INTEGER)"
 
         val createNoSociosTable = """
-    CREATE TABLE $TABLE_NO_SOCIOS (
-        $COLUMN_ID INTEGER PRIMARY KEY, 
-        $COLUMN_DOCUMENTO TEXT, 
-        $COLUMN_CNOMBRE TEXT, 
-        $COLUMN_APELLIDO TEXT, 
-        $COLUMN_FECHANACIMIENTO TEXT, 
-        $COLUMN_DOMICILIO TEXT, 
-        $COLUMN_EMAIL TEXT 
-    )
-""".trimIndent()
+        CREATE TABLE $TABLE_NO_SOCIOS (
+            $COLUMN_ID INTEGER PRIMARY KEY, 
+            $COLUMN_DOCUMENTO TEXT, 
+            $COLUMN_CNOMBRE TEXT, 
+            $COLUMN_APELLIDO TEXT, 
+            $COLUMN_FECHANACIMIENTO TEXT, 
+            $COLUMN_DOMICILIO TEXT, 
+            $COLUMN_EMAIL TEXT 
+        )
+        """.trimIndent()
 
         db?.execSQL(createTable)
         db?.execSQL(createSociosTable)
