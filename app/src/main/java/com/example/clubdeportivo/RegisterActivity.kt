@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class RegisterActivity : AppCompatActivity() {
+
     private lateinit var dbHelper: BDatos
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +64,7 @@ class RegisterActivity : AppCompatActivity() {
             }
 
         // Crear un Intent para abrir la InformationActivity
-        val intent = Intent(this, InformationActivity::class.java)
+        val intent = Intent(this, MenuActivity::class.java)
             startActivity(intent)
         }
 

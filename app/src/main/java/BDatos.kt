@@ -5,13 +5,18 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
+//class DatabaseHelper(context: Context) : SQLiteOpenHelper(context,
+  //  DATABASE_NAME, null, DATABASE_VERSION) {
+
+//}
+
 class BDatos(context: Context) : SQLiteOpenHelper(context,
     BD, null, DATABASE_VERSION) {
 
     //inicio tabla usuarios
     companion object {
         private const val BD = "BaseDatos"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 7
 
         // Nombre de la tabla y columnas
         private const val TABLE_USUARIOS = "Usuarios"
@@ -40,6 +45,8 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
                 + "$COLUMN_TIPO TEXT)")
         //val createSociosTable = "CREATE TABLE $TABLE_SOCIOS ($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_NAME TEXT, $COLUMN_AGE INTEGER)"
 
+        db?.execSQL(createTable)
+
         val createSociosTable = """
         CREATE TABLE $TABLE_SOCIOS (
             $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -49,9 +56,11 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
             $COLUMN_FECHANACIMIENTO TEXT, 
             $COLUMN_DOMICILIO TEXT, 
             $COLUMN_EMAIL TEXT, 
-            $COLUMN_APTOFISICO INTEGER
+            $COLUMN_APTOFISICO TEXT
         )
         """.trimIndent()
+
+        db?.execSQL(createSociosTable)
 
         //val createNoSociosTable = "CREATE TABLE $TABLE_NO_SOCIOS ($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_NAME TEXT, $COLUMN_AGE INTEGER)"
 
@@ -67,12 +76,10 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         )
         """.trimIndent()
 
-        db?.execSQL(createTable)
-        db?.execSQL(createSociosTable)
         db?.execSQL(createNoSociosTable)
 
 
-
+        /*
         val adminValues = ContentValues().apply {
             put(COLUMN_NOMBRE, "admin")
             put(COLUMN_PASSWORD, "admin")
@@ -81,6 +88,7 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         if (db != null) {
             db.insert(TABLE_USUARIOS, null, adminValues)
         }
+*/
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -98,12 +106,12 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         fechanacimiento: String,
         domicilio: String,
         email: String,
-        aptoFisico: String
+        aptoFisico: String,
     ) {
         val db = writableDatabase
         val contentValues = ContentValues().apply {
             put(COLUMN_DOCUMENTO, documento)
-            put(COLUMN_NOMBRE, nombre)
+            put(COLUMN_CNOMBRE, nombre)
             put(COLUMN_APELLIDO, apellido)
             put(COLUMN_FECHANACIMIENTO, fechanacimiento)
             put(COLUMN_DOMICILIO, domicilio)
@@ -121,6 +129,39 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
            // put(COLUMN_AGE, age)
        // }
    // }
+    fun getSocioByDocumento(documento: String): Socio? {
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_SOCIOS, // Tabla
+            null, // Columnas (null para todas)
+            "$COLUMN_DOCUMENTO = ?", // Selección
+            arrayOf(documento), // Argumentos de selección
+            null, // Agrupamiento
+            null, // Filtro de grupo
+            null // Orden
+        )
+
+        var socio: Socio? = null
+        cursor.use {
+            if (it.moveToFirst()) {
+                socio = Socio(
+
+                    documento = it.getString(it.getColumnIndexOrThrow(COLUMN_DOCUMENTO)),
+                    cnombre = it.getString(it.getColumnIndexOrThrow(COLUMN_CNOMBRE)),
+                    apellido = it.getString(it.getColumnIndexOrThrow(COLUMN_APELLIDO)),
+                    domicilio = it.getString(it.getColumnIndexOrThrow(COLUMN_DOMICILIO)),
+                    aptofisico = it.getString(it.getColumnIndexOrThrow(COLUMN_APTOFISICO)),
+                    fechanacimiento = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHANACIMIENTO)),
+                    email = it.getString(it.getColumnIndexOrThrow(COLUMN_EMAIL)),
+
+                    // Agrega aquí otros atributos del socio si es necesario
+                )
+            }
+        }
+
+        return socio
+    }
+
     fun insertNoSocio(
         documento: String,
         nombre: String,
@@ -132,7 +173,7 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         val db = writableDatabase
         val contentValues = ContentValues().apply {
             put(COLUMN_DOCUMENTO, documento)
-            put(COLUMN_NOMBRE, nombre)
+            put(COLUMN_CNOMBRE, nombre)
             put(COLUMN_APELLIDO, apellido)
             put(COLUMN_FECHANACIMIENTO, fechanacimiento)
             put(COLUMN_DOMICILIO, domicilio)
@@ -186,20 +227,68 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         val db = this.writableDatabase
         return db.delete(TABLE_USUARIOS, "$COLUMN_ID = ?", arrayOf(idUsuario.toString()))
     }
-    fun agregarUsuariosEjemplo() {
-        val usuario1 = Usuario(idUsuario = 1, nombreUsuario = "admin", password = "admin", tipo = "1")
-        addUsuario(usuario1)
 
-        // Dos registros con tipo = 2
-        val usuario2 = Usuario(idUsuario = 2, nombreUsuario = "11223344", password = "1234", tipo = "2")
-        val usuario3 = Usuario(idUsuario = 3, nombreUsuario = "12345678", password = "5678", tipo = "2")
-        addUsuario(usuario2)
-        addUsuario(usuario3)
+    fun agregarUsuariosEjemplo(): Boolean {
+        return try {
+            val db = writableDatabase
 
-        // Dos registros con tipo = 3
-        val usuario4 = Usuario(idUsuario = 4, nombreUsuario = "87654321", password = "8778", tipo = "3")
-        val usuario5 = Usuario(idUsuario = 5, nombreUsuario = "44332211", password = "9876", tipo = "3")
-        addUsuario(usuario4)
-        addUsuario(usuario5)
+            val usuarios = listOf(
+                Usuario(1, "admin", "admin", "1"),
+                Usuario(2, "11223344", "1234", "2"),
+                Usuario(3, "12345678", "5678", "3")
+             )
+
+            for (usuario in usuarios) {
+                val values = ContentValues().apply {
+                    put(COLUMN_NOMBRE, usuario.nombreUsuario)
+                    put(COLUMN_PASSWORD, usuario.password)
+                    put(COLUMN_TIPO, usuario.tipo)
+                }
+                db.insert(TABLE_USUARIOS, null, values)
+            }
+
+            db.close()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
+
+    //data class Usuario(val idUsuario: Int, val nombreUsuario: String, val nombreUsuario: String, val password: String, val tipo: String)
+
+   data class Socio(val documento: String, val cnombre: String, val apellido: String, val fechanacimiento: String, val domicilio: String, val email: String, val aptofisico: String)
+
+    fun agregarSociosEjemplo(): Boolean {
+        return try {
+            val db = writableDatabase
+
+            val socios = listOf(
+                Socio("12345", "Pepe1", "argento", "123", "sarasa 123", "sss@sss.com", "1"),
+                Socio("123456", "Pepe2", "argento", "1234", "sarasa 1234", "sss@sss.com", "1"),
+                Socio("1234567", "Pepe3", "argento", "12345", "sarasa 12345", "sss@sss.com", "1"),
+                )
+
+            for (socio in socios) {
+                val values = ContentValues().apply {
+                    put(COLUMN_DOCUMENTO, socio.documento)
+                    put(COLUMN_CNOMBRE, socio.cnombre)
+                    put(COLUMN_APELLIDO, socio.apellido)
+                    put(COLUMN_FECHANACIMIENTO, socio.fechanacimiento)
+                    put(COLUMN_DOMICILIO, socio.domicilio)
+                    put(COLUMN_EMAIL, socio.email)
+                    put(COLUMN_APTOFISICO, socio.aptofisico)
+                }
+                db.insert(TABLE_SOCIOS, null, values)
+            }
+
+            db.close()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+
 }

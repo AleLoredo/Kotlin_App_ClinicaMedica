@@ -31,6 +31,9 @@ class LoginActivity : AppCompatActivity() {
             val username = editTextUsername.text.toString()
             val password = editTextPassword.text.toString()
 
+
+
+
             if (authenticateUser(username, password)) {
                 Toast.makeText(this, "Login successful", LENGTH_SHORT).show()
 
