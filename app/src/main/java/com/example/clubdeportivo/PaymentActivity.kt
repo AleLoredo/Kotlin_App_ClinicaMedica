@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class PaymentActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +24,7 @@ class PaymentActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val btnAcceptPey = findViewById<Button>(R.id.btnAcceptPey)
+        val btnAcceptPey = findViewById<Button>(R.id.btnAcceptPay)
         btnAcceptPey.setOnClickListener{
             // Crear un Intent para abrir la VoucherActivity
             val intent = Intent(this, VoucherActivity::class.java)

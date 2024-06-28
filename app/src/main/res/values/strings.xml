@@ -9,6 +9,9 @@
     <string name="domicilio">Domicilio</string>
     <string name="email">Correo electrónico</string>
     <string name="aptoFisico">Apto físico</string>
+    <string name="fechaVenc">Fecha vencimiento</string>
+    <string name="fechaCobro">Fecha cobro</string>
+    <string name="Monto">Monto</string>
     <string name="nroTicket">Nro.Ticket</string>
     <string name="importe">Importe</string>
     <string-array name="listadeDoc">

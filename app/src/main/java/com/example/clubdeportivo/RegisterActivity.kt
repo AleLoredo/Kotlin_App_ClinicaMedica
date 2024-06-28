@@ -1,6 +1,7 @@
 package com.example.clubdeportivo
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -9,6 +10,7 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import java.time.LocalDate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -34,6 +36,9 @@ class RegisterActivity : AppCompatActivity() {
         val etEmail = findViewById<EditText>(R.id.inputEmail)
         val etRadioGroupTipo = findViewById<RadioGroup>(R.id.radioGroupTipo)
         val etAptoFisico = findViewById<EditText>(R.id.inputAptoFisico)
+        val etFechaCobro = findViewById<EditText>(R.id.inputFechaCobro)
+        val etFechaVenc = findViewById<EditText>(R.id.inputFechaVenc)
+        val etMonto = findViewById<EditText>(R.id.inputMonto)
 
         val btnAccept = findViewById<Button>(R.id.btnAccept)
 
@@ -46,16 +51,24 @@ class RegisterActivity : AppCompatActivity() {
             val domicilio = etDomicilio.text.toString()
             val email = etEmail.text.toString()
             val aptoFisico = etAptoFisico.text.toString()
+            val fechaCobro = etFechaCobro.text.toString()
+            val fechaVenc = etFechaVenc.text.toString()
+            val monto = etMonto.text.toString()
+            val fechaInsc : LocalDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LocalDate.now()
+            } else {
+                TODO("VERSION.SDK_INT < O")
+            }
             val selectedRadioButtonId = etRadioGroupTipo.checkedRadioButtonId
 
             if (selectedRadioButtonId != -1) {
                 val isSocio = findViewById<RadioButton>(selectedRadioButtonId).text == "Socio"
 
                 if (isSocio) {
-                    dbHelper.insertSocio(documento, nombre, apellido, fechanacimiento, domicilio, email, aptoFisico )
+                    dbHelper.insertSocio(documento, nombre, apellido, fechanacimiento, domicilio, email, aptoFisico, fechaInsc.toString(), fechaCobro, fechaVenc, monto)
                     Toast.makeText(this, "Socio registrado con éxito", Toast.LENGTH_SHORT).show()
                 } else {
-                    dbHelper.insertNoSocio(documento, nombre, apellido, fechanacimiento, domicilio, email)
+                    dbHelper.insertNoSocio(documento, nombre, apellido, fechanacimiento, domicilio, email, fechaInsc.toString(), fechaCobro, fechaVenc, monto)
                     Toast.makeText(this, "No socio registrado con éxito", Toast.LENGTH_SHORT).show()
                 }
                 finish()

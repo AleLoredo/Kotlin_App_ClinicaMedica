@@ -25,13 +25,13 @@ class MenuActivity : AppCompatActivity() {
         dbHelper = BDatos(this)
 
         val btnListarVencimientos = findViewById<Button>(R.id.btnListarVencimientos)
-        btnListarVencimientos.setOnClickListener{
+        btnListarVencimientos.setOnClickListener {
             // Crear un Intent para abrir la ListActivity
             val intent = Intent(this, ListActivity::class.java)
             startActivity(intent)
         }
 
-       /* val btnConsultar = findViewById<Button>(R.id.btnConsultar)
+        /* val btnConsultar = findViewById<Button>(R.id.btnConsultar)
         btnConsultar.setOnClickListener{
             // Crear un Intent para abrir la InformationActivity
             val intent = Intent(this, InformationActivity::class.java)
@@ -39,27 +39,60 @@ class MenuActivity : AppCompatActivity() {
         }*/
 
         val btnRegisterClients = findViewById<Button>(R.id.btnRegisterClients)
-        btnRegisterClients.setOnClickListener{
+        btnRegisterClients.setOnClickListener {
             // Crear un Intent para abrir la RegisterActivity
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
 
-        val btnRegisterPayment = findViewById<Button>(R.id.btnRegisterPayment)
-        btnRegisterPayment.setOnClickListener{
-            // Crear un Intent para abrir la PaymentActivity
-            val intent = Intent(this, PaymentActivity::class.java)
-            startActivity(intent)
-        }
-
-
-
         val editTextDNI = findViewById<TextInputEditText>(R.id.editTextDNI)
-        val btnConsultarMenu = findViewById<Button>(R.id.btnConsultarMenu)
+
+
         //val textViewResult = findViewById<TextView>(R.id.textViewResult) // Asegúrate de tener este TextView en tu layout
 
+        val btnRegisterPayment = findViewById<Button>(R.id.btnRegisterPayment)
+        btnRegisterPayment.setOnClickListener {
 
+            val dni = editTextDNI.text.toString()
+
+            if (dni.isNotEmpty()) {
+                val socio = dbHelper.getSocioByDocumento(dni)
+
+                if (socio != null) {
+                    // Iniciar CarnetActivity y pasar los datos del usuario
+                    val flagSocio = "1"
+                    val intent = Intent(this, PayActivity::class.java).apply {
+                        putExtra("nombre", socio.cnombre)
+                        putExtra("apellido", socio.apellido)
+                        putExtra("documento", dni)
+                        putExtra("essocio", flagSocio)
+                    }
+                    startActivity(intent)
+                } else if (socio == null) {
+                    val NoSocio = dbHelper.getNoSocioByDocumento(dni)
+                    if (NoSocio != null) {
+                        val flagSocio = "0"
+                        val intent = Intent(this, PayActivity::class.java).apply {
+                            putExtra("nombre", NoSocio.cnombre)
+                            putExtra("apellido", NoSocio.apellido)
+                            putExtra("documento", dni)
+                            putExtra("essocio", flagSocio)
+                        }
+                        startActivity(intent)
+                    } else {
+                        //textViewResult.text = "Usuario no encontrado."
+                        Toast.makeText(this, "No existe registro con ese DNI", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } else {
+                    editTextDNI.error = "El DNI es obligatorio"
+                }
+            }
+        }
+
+        val btnConsultarMenu = findViewById<Button>(R.id.btnConsultarMenu)
         btnConsultarMenu.setOnClickListener {
+
             val dni = editTextDNI.text.toString()
 
             if (dni.isNotEmpty()) {
@@ -84,6 +117,7 @@ class MenuActivity : AppCompatActivity() {
                 editTextDNI.error = "El DNI es obligatorio"
             }
         }
+
 
     }
 }

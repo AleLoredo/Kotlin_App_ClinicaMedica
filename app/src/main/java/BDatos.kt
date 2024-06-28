@@ -4,6 +4,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
+import java.time.LocalDate
 
 //class DatabaseHelper(context: Context) : SQLiteOpenHelper(context,
   //  DATABASE_NAME, null, DATABASE_VERSION) {
@@ -16,7 +18,7 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
     //inicio tabla usuarios
     companion object {
         private const val BD = "BaseDatos"
-        private const val DATABASE_VERSION = 7
+        private const val DATABASE_VERSION = 9
 
         // Nombre de la tabla y columnas
         private const val TABLE_USUARIOS = "Usuarios"
@@ -35,6 +37,10 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         private const val COLUMN_DOMICILIO = "domicilio"
         private const val COLUMN_EMAIL = "email"
         private const val COLUMN_APTOFISICO = "aptoFisico"
+        private const val COLUMN_FECHAINSC = "fechaInsc"
+        private const val COLUMN_FECHACOBRO = "fechaCobro"
+        private const val COLUMN_FECHAVENC = "fechaVenc"
+        private const val COLUMN_MONTO = "Monto"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -56,7 +62,11 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
             $COLUMN_FECHANACIMIENTO TEXT, 
             $COLUMN_DOMICILIO TEXT, 
             $COLUMN_EMAIL TEXT, 
-            $COLUMN_APTOFISICO TEXT
+            $COLUMN_APTOFISICO TEXT,
+            $COLUMN_FECHAINSC TEXT,
+            $COLUMN_FECHACOBRO TEXT,
+            $COLUMN_FECHAVENC TEXT,
+            $COLUMN_MONTO TEXT
         )
         """.trimIndent()
 
@@ -72,7 +82,11 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
             $COLUMN_APELLIDO TEXT, 
             $COLUMN_FECHANACIMIENTO TEXT, 
             $COLUMN_DOMICILIO TEXT, 
-            $COLUMN_EMAIL TEXT 
+            $COLUMN_EMAIL TEXT,
+            $COLUMN_FECHAINSC TEXT,
+            $COLUMN_FECHACOBRO TEXT,
+            $COLUMN_FECHAVENC TEXT,
+            $COLUMN_MONTO TEXT
         )
         """.trimIndent()
 
@@ -107,6 +121,13 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         domicilio: String,
         email: String,
         aptoFisico: String,
+        fechaInsc: String,
+        fechaCobro: String,
+        fechaVenc: String,
+        monto: String
+
+
+
     ) {
         val db = writableDatabase
         val contentValues = ContentValues().apply {
@@ -117,6 +138,10 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
             put(COLUMN_DOMICILIO, domicilio)
             put(COLUMN_EMAIL, email)
             put(COLUMN_APTOFISICO, aptoFisico)
+            put(COLUMN_FECHAINSC, fechaInsc)
+            put(COLUMN_FECHACOBRO, fechaCobro)
+            put(COLUMN_FECHAVENC, fechaVenc)
+            put(COLUMN_MONTO, monto)
         }
         db.insert(TABLE_SOCIOS, null, contentValues)
     }
@@ -153,11 +178,51 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
                     aptofisico = it.getString(it.getColumnIndexOrThrow(COLUMN_APTOFISICO)),
                     fechanacimiento = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHANACIMIENTO)),
                     email = it.getString(it.getColumnIndexOrThrow(COLUMN_EMAIL)),
-
-                    // Agrega aquí otros atributos del socio si es necesario
+                    fechaInsc = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHAINSC)),
+                    fechaCobro = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHACOBRO)),
+                    fechaVenc = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHAVENC)),
+                    monto = it.getString(it.getColumnIndexOrThrow(COLUMN_MONTO))
+                   // Agregar aquí otros atributos del socio si es necesario
                 )
             }
         }
+
+
+        return socio
+    }
+
+    fun getNoSocioByDocumento(documento: String): NoSocio? {
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_NO_SOCIOS, // Tabla
+            null, // Columnas (null para todas)
+            "$COLUMN_DOCUMENTO = ?", // Selección
+            arrayOf(documento), // Argumentos de selección
+            null, // Agrupamiento
+            null, // Filtro de grupo
+            null // Orden
+        )
+
+        var socio: NoSocio? = null
+        cursor.use {
+            if (it.moveToFirst()) {
+                socio = NoSocio(
+
+                    documento = it.getString(it.getColumnIndexOrThrow(COLUMN_DOCUMENTO)),
+                    cnombre = it.getString(it.getColumnIndexOrThrow(COLUMN_CNOMBRE)),
+                    apellido = it.getString(it.getColumnIndexOrThrow(COLUMN_APELLIDO)),
+                    domicilio = it.getString(it.getColumnIndexOrThrow(COLUMN_DOMICILIO)),
+                    fechanacimiento = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHANACIMIENTO)),
+                    email = it.getString(it.getColumnIndexOrThrow(COLUMN_EMAIL)),
+                    fechaInsc = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHAINSC)),
+                    fechaCobro = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHACOBRO)),
+                    fechaVenc = it.getString(it.getColumnIndexOrThrow(COLUMN_FECHAVENC)),
+                    monto = it.getString(it.getColumnIndexOrThrow(COLUMN_MONTO))
+                    // Agregar aquí otros atributos del socio si es necesario
+                )
+            }
+        }
+
 
         return socio
     }
@@ -169,6 +234,10 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         fechanacimiento: String,
         domicilio: String,
         email: String,
+        fechaInsc: String,
+        fechaCobro: String,
+        fechaVenc: String,
+        monto: String
     ) {
         val db = writableDatabase
         val contentValues = ContentValues().apply {
@@ -178,6 +247,10 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
             put(COLUMN_FECHANACIMIENTO, fechanacimiento)
             put(COLUMN_DOMICILIO, domicilio)
             put(COLUMN_EMAIL, email)
+            put(COLUMN_FECHAINSC, fechaInsc)
+            put(COLUMN_FECHACOBRO, fechaCobro)
+            put(COLUMN_FECHAVENC, fechaVenc)
+            put(COLUMN_MONTO, monto)
         }
         db.insert(TABLE_NO_SOCIOS, null, contentValues)
     }
@@ -228,6 +301,100 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
         return db.delete(TABLE_USUARIOS, "$COLUMN_ID = ?", arrayOf(idUsuario.toString()))
     }
 
+    //inicia funciones registro pago
+
+    fun registrarPagosSocio(documento: String, fechaCobro: LocalDate, fechaVenc: String, monto: String) {
+        val db = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put(COLUMN_FECHACOBRO, fechaCobro.toString())
+            put(COLUMN_FECHAVENC, fechaVenc)
+            put(COLUMN_MONTO, monto)
+        }
+
+        val selection = "$COLUMN_DOCUMENTO = ?"
+        val selectionArgs = arrayOf(documento)
+
+        val count = db.update(
+            TABLE_SOCIOS,
+            contentValues,
+            selection,
+            selectionArgs
+        )
+
+        if (count > 0) {
+            Log.d("BDatos", "Pago registrado correctamente para el socio con documento $documento")
+        } else {
+            Log.d("BDatos", "Error al registrar el pago para el socio con documento $documento")
+        }
+
+        db.close()
+    }
+
+    fun registrarPagosNoSocio(documento: String, fechaCobro: LocalDate, fechaVenc: String, monto: String) {
+        val db = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put(COLUMN_FECHACOBRO, fechaCobro.toString())
+            put(COLUMN_FECHAVENC, fechaVenc)
+            put(COLUMN_MONTO, monto)
+        }
+
+        val selection = "$COLUMN_DOCUMENTO = ?"
+        val selectionArgs = arrayOf(documento)
+
+        val count = db.update(
+            TABLE_NO_SOCIOS,
+            contentValues,
+            selection,
+            selectionArgs
+        )
+
+        if (count > 0) {
+            Log.d("BDatos", "Pago registrado correctamente para el no-socio con documento $documento")
+        } else {
+            Log.d("BDatos", "Error al registrar el pago para el no-socio con documento $documento")
+        }
+
+        db.close()
+    }
+
+
+
+    /*
+        fun registrarPagosSocio(documento: String, fechaCobro: String, fechaVenc: String, monto: String) {
+            //en menuactiv meto DNI y voy a registrar pago
+            //yo ya se el DNI y si es socio o no socio
+            //en pay_activity tengo el cuadro monto y fecha venc y
+            // #decuota* y tipodepago* que las voy a mantener como variables
+
+            val db = this.writableDatabase
+            val contentValues = ContentValues().apply {
+                put(COLUMN_FECHACOBRO, socio.fechaCobro)
+                put(COLUMN_FECHAVENC, socio.fechaVenc)
+                put(COLUMN_MONTO, socio.monto)
+
+                return db.update(TABLE_SOCIOS, contentValues, "$COLUMN_DOCUMENTO = ?", arrayOf(socio.XXXX.toString()))
+            }
+        }
+
+        fun registrarPagosNoSocio(documento: String, flagSocio: Int) {
+            //en menuactiv meto DNI y voy a registrar pago
+            //yo ya se el DNI y si es socio o no socio
+            //en pay_activity tengo el cuadro monto y fecha venc y
+            // #decuota* y tipodepago* que las voy a mantener como variables
+
+            val db = this.writableDatabase
+            val contentValues = ContentValues().apply {
+                put(COLUMN_FECHACOBRO, socio.fechaCobro)
+                put(COLUMN_FECHAVENC, socio.fechaVenc)
+                put(COLUMN_MONTO, socio.monto)
+
+                return db.update(TABLE_NO_SOCIOS, contentValues, "$COLUMN_DOCUMENTO = ?", arrayOf(noSocio.XXXX.toString()))
+            }
+        }
+
+    */
+
+
     fun agregarUsuariosEjemplo(): Boolean {
         return try {
             val db = writableDatabase
@@ -257,17 +424,21 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
 
     //data class Usuario(val idUsuario: Int, val nombreUsuario: String, val nombreUsuario: String, val password: String, val tipo: String)
 
-   data class Socio(val documento: String, val cnombre: String, val apellido: String, val fechanacimiento: String, val domicilio: String, val email: String, val aptofisico: String)
+   data class Socio(val documento: String, val cnombre: String, val apellido: String, val fechanacimiento: String, val domicilio: String, val email: String, val aptofisico: String, val fechaInsc: String, val fechaCobro: String, val fechaVenc: String, val monto: String)
+
+    data class NoSocio(val documento: String, val cnombre: String, val apellido: String, val fechanacimiento: String, val domicilio: String, val email: String, val fechaInsc: String, val fechaCobro: String, val fechaVenc: String, val monto: String)
+
 
     fun agregarSociosEjemplo(): Boolean {
         return try {
             val db = writableDatabase
 
             val socios = listOf(
-                Socio("12345", "Pepe1", "argento", "123", "sarasa 123", "sss@sss.com", "1"),
-                Socio("123456", "Pepe2", "argento", "1234", "sarasa 1234", "sss@sss.com", "1"),
-                Socio("1234567", "Pepe3", "argento", "12345", "sarasa 12345", "sss@sss.com", "1"),
+                Socio("12345", "Pepe1", "argento", "123", "sarasa 123", "sss@sss.com", "1","1","1","1","1"),
+                Socio("123456", "Pepe2", "argento", "1234", "sarasa 1234", "sss@sss.com", "1","1","1","1","1"),
+                Socio("1234567", "Pepe3", "argento", "12345", "sarasa 12345", "sss@sss.com", "1","1","1","1","1"),
                 )
+
 
             for (socio in socios) {
                 val values = ContentValues().apply {
@@ -278,6 +449,10 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
                     put(COLUMN_DOMICILIO, socio.domicilio)
                     put(COLUMN_EMAIL, socio.email)
                     put(COLUMN_APTOFISICO, socio.aptofisico)
+                    put(COLUMN_FECHAINSC,  socio.fechaInsc)
+                    put(COLUMN_FECHACOBRO,  socio.fechaCobro)
+                    put(COLUMN_FECHAVENC,  socio.fechaVenc)
+                    put(COLUMN_MONTO,  socio.monto)
                 }
                 db.insert(TABLE_SOCIOS, null, values)
             }
@@ -289,6 +464,4 @@ class BDatos(context: Context) : SQLiteOpenHelper(context,
             false
         }
     }
-
-
 }
